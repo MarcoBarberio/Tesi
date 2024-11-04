@@ -30,7 +30,7 @@ def get_similarity(word):
     
     similarity=0
     sum_weight=0
-    for name,embedding in dictionary_embeddings_list.items():
+    for embedding in dictionary_embeddings_list.values():
         dictionary_embedding=numpy.array(embedding[0])
         reshaped_dictionary_embedding=dictionary_embedding.reshape(1,-1)
         single_similarity=cosine_similarity(reshaped_word_embedding,reshaped_dictionary_embedding)[0][0] #somiglianza tra centroide e vettore di parole calcolata come il coseno dell'angolo tra i tensori

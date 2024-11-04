@@ -3,3 +3,7 @@ Script_scraping_file_DF_similarity_search/__pycache__/scraper.cpython-312.pyc
 Script_scraping_file_DF_similarity_search/__pycache__/node.cpython-312.pyc
 Script_scraping_file_DF_similarity_search/__pycache__/create_centroid.cpython-312.pyc
 Script_scraping_file_DF_similarity_search/centroid.json
+Script_scraping_file_DF_similarity_search/__pycache__/create_dictionary_embeddings.cpython-312.pyc
+Script_scraping_file_DF_similarity_search/__pycache__/model_and_tokenizer.cpython-312.pyc
+Script_scraping_file_DF_similarity_search/__pycache__/worker.cpython-312.pyc
+

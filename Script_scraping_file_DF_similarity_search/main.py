@@ -1,63 +1,39 @@
-from scraper import get_links
-from utilities import get_resource_name,get_file_extension,is_valid_url
-from similarity_search import get_similarity
-from node import File_node,URL_node
+from utilities import get_resource_name,is_valid_url
+from node import URL_node
 from datetime import datetime
-similarity_threshold=0.16
-def crawl(node,max_depth,visited_url):
-    if node is None:
-        return None
-    if node.depth>=max_depth:
-        return None
-    links=get_links(node.url)
-    if links["status_code"]!=200:
-        return None
-    print(node.url+": "+str(node.similarity))
-    url_nodes=[]
-    file_nodes=[]
-    for link,text,parent in links["redirect_links"]:
-        if link in visited_url:
-            continue
-        visited_url.append(link)
-        resource_name=get_resource_name(link)
-        similarity=get_similarity(link+","+text+","+parent)
-        if similarity>similarity_threshold:
-            new_node=URL_node(link,node.depth+1,node,resource_name,similarity)
-            new_node.print_data()
-            url_nodes.append(new_node)
-    for file,text,parent in links["files"]:
-        resource_name=get_resource_name(file)
-        similarity=get_similarity(file+","+text+","+parent)
-        if similarity>similarity_threshold:
-            new_node=File_node(file,node.depth+1,node,get_file_extension(file),resource_name,similarity)
-            new_node.print_data()
-            file_nodes.append(new_node)    
-    return (url_nodes,file_nodes)
-
-def crawler(root_url,max_depth):
+from queue import Queue
+import threading
+from worker import worker
+n_threads=10
+def crawl(root_url,max_depth):
     if not is_valid_url(root_url):
         return
     
     root_resource_name=get_resource_name(root_url)
     root=URL_node(root_url,0,None,root_resource_name,0)
-    url_queue=[root]
+    url_queue=Queue()
+    url_queue.put(root)
     file_queue=[]
-    visited_url=[root]
-    while url_queue:
-        node=url_queue.pop() #nodo con priorità piu alta
-        visited_url.append(node.url)
-        links=crawl(node,max_depth,visited_url)
-        if links is not None:
-            url_queue.extend(links[0])
-            file_queue.extend(links[1])
-        url_queue.sort(key=lambda node: node.similarity)
+    visited_url=set()
+    lock=threading.Lock()
+    threads=[]
+    
+    for i in range(n_threads):
+        thread=threading.Thread(target=worker,args=(max_depth,visited_url,url_queue,file_queue,lock))
+        thread.start()
+        threads.append(thread)
+    url_queue.join()
+    for thread in threads:
+        url_queue.put(None)
+    for thread in threads:
+        thread.join()
     file_queue.sort(key=lambda node: node.similarity)
     return file_queue
 
 if __name__=="__main__":
-    depth=3
+    depth=5
     x=datetime.now()
-    crawler("https://www.efrag.org/en",depth)
+    crawl("https://www.efrag.org/en",depth)
     diff=datetime.now()-x
     total_seconds = diff.total_seconds()
     minutes = int(total_seconds // 60)
