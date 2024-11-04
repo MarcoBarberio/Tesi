@@ -1,9 +1,9 @@
-import numpy
-from transformers import XLMRobertaTokenizer, XLMRobertaModel
+from model_and_tokenizer import get_model_and_tokenizer
 import torch
+import torch.nn.functional as F
 import json
 
-dizionary = [
+dictionary = [
     "Bilancio di sostenibilità",
     "Report di sostenibilità",
     "Sustainability report",
@@ -109,20 +109,19 @@ dizionary = [
     "Climate action",
     "Biodiversity report"
 ]
+#funzione che restituisce una rappresentazione complessiva del dizionario
+def mean_pooling(model_output, attention_mask):
+    token_embeddings = model_output[0]
+    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+    return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
 def create_centroid():
-    tokenizer=XLMRobertaTokenizer.from_pretrained("xlm-roberta-base") #alcune stringhe possono essere composte da più parole separate da un token
-    model=XLMRobertaModel.from_pretrained("xlm-roberta-base")
-    embeddings=[]
-    for word in dizionary:
-        inputs=tokenizer(word,return_tensors="pt") #restituisce tensori di pytorch
-        with torch.no_grad(): #permette di risparmiare memoria, in quanto non calcola i gradienti (non stiamo addestrando il modello)
-            outputs=model(**inputs) #l'output del modello
-            #si estraggono i vettori di embedding per ciascun token, se ne calcola la media, si eliminano dimensioni inutili e si converte il tensore torch in numpy
-        word_embedding=outputs.last_hidden_state.mean(dim=1).squeeze().numpy()
-        embeddings.append(word_embedding)
-    if embeddings:
-        centroid=numpy.mean(embeddings,axis=0)
-        centroid_list=centroid.tolist()
-        with open("centroid.json","w") as f:
-            json.dump(centroid_list,f)
+    model,tokenizer=get_model_and_tokenizer()
+    inputs = tokenizer(dictionary, padding=True, truncation=True, return_tensors="pt") #restituisce tensori di pytorch
+    with torch.no_grad(): #permette di risparmiare memoria, in quanto non calcola i gradienti (non stiamo addestrando il modello)
+        output=model(**inputs) #l'output del modello
+    centroid = mean_pooling(output, inputs['attention_mask'])
+    centroid = F.normalize(centroid, p=2, dim=1).mean(dim=0).numpy()
+    centroid_list=centroid.tolist()
+    with open("centroid.json","w") as f:
+        json.dump(centroid_list,f)

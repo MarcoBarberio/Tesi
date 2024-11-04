@@ -20,17 +20,17 @@ def crawl(node,max_depth,visited_url):
         visited_url.append(link)
         resource_name=get_resource_name(link)
         similarity=get_similarity(link)
-        if similarity>0:
-            new_node=URL_node(link,node.depth+1,node,resource_name,similarity)
-            new_node.print_data()
-            url_nodes.append(new_node)
+        #if similarity>0:
+        new_node=URL_node(link,node.depth+1,node,resource_name,similarity)
+        new_node.print_data()
+        url_nodes.append(new_node)
     for file in links["files"]:
         resource_name=get_resource_name(file)
         similarity=get_similarity(file)
-        if similarity>0:
-            new_node=File_node(file,node.depth+1,node,get_extension(file),resource_name,similarity)
-            new_node.print_data()
-            file_nodes.append(new_node)    
+        #if similarity>0:
+        new_node=File_node(file,node.depth+1,node,get_extension(file),resource_name,similarity)
+        new_node.print_data()
+        file_nodes.append(new_node)    
     return (url_nodes,file_nodes)
 
 def crawler(root_url,max_depth):
@@ -56,7 +56,7 @@ def crawler(root_url,max_depth):
 if __name__=="__main__":
     depth=1
     x=datetime.now()
-    crawler("https://quotes.toscrape.com/",depth)
+    crawler("https://www.efrag.org/en",depth)
     diff=datetime.now()-x
     total_seconds = diff.total_seconds()
     minutes = int(total_seconds // 60)
