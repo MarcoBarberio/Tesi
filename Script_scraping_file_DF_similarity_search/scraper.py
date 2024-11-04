@@ -45,20 +45,26 @@ def get_links(url):
 
 def static_search(soup,url,link_dict):
     domain = get_domain(url)
-    for link in soup.find_all("a", href=True):
+    links=soup.find_all("a",href=True)
+    for link in links:
         href = link.get("href")
+        text=link.text
+        link_parent=link.parent.text
+        parent=""
+        if link_parent is not None:
+            parent=get_random_words(link_parent)
+            
         full_url = urljoin(url, href) 
-
         if full_url == url:
             continue      
         full_url_domain = get_domain(full_url)
         if full_url_domain != domain:
             continue
         if full_url.lower().endswith(extensions):
-                link_dict["files"].append(full_url)
+                link_dict["files"].append((full_url,text,parent))
         else:
             #if ai_link_filter(full_url):
-                link_dict["redirect_links"].append(full_url)
+                link_dict["redirect_links"].append((full_url,text,parent))
 
 def dynamic_search(url,link_dict):
     print("contenuti dinamici")
@@ -107,3 +113,14 @@ def is_valid_url(url):
 
 def check_dynamic_content(soup):
     return bool(soup.find_all("div",class_="dynamic_content"))
+
+def get_random_words(text):
+    words=text.split()
+    n=random.randint(10,20)
+    if(n>len(words)):
+        return text
+    words=random.sample(words,n)
+    result_text=""
+    for word in words:
+        result_text+=" "+word
+    return result_text
