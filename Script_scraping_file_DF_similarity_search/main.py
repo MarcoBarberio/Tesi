@@ -4,6 +4,7 @@ from datetime import datetime
 from queue import Queue
 import threading
 from worker import worker
+from model import Model
 n_threads=10
 def crawl(root_url,max_depth):
     if not is_valid_url(root_url):
@@ -31,12 +32,15 @@ def crawl(root_url,max_depth):
     return file_queue
 
 if __name__=="__main__":
-    depth=5
+    model=Model()
+    print(model.get_similarity("sustainability"))
+    depth=1
     x=datetime.now()
-    crawl("https://www.efrag.org/en",depth)
+    crawl("https://quotes.toscrape.com/",depth)
     diff=datetime.now()-x
     total_seconds = diff.total_seconds()
     minutes = int(total_seconds // 60)
     seconds = int(total_seconds % 60)
     
     print("Profondità "+str(depth)+": "+str(minutes)+" min "+str(seconds)+"s")
+    

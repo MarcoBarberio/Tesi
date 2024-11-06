@@ -1,6 +1,6 @@
 import random
 from urllib.parse import urlparse
-
+import re
 extensions= (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")
 
 def get_random_user_agent():
@@ -44,3 +44,8 @@ def get_random_words(text):
     for word in words:
         result_text+=" "+word
     return result_text
+
+def get_clean_url(url):
+    return re.sub(r"[\/\d]"," ",url)
+
+    
