@@ -33,7 +33,7 @@ class URL_node(Node):
 class File_node(Node):
     def __init__(self,url,depth,father,extension,resource_name,similarity):
         super().__init__(url,depth,father,resource_name,similarity)
-        self.extension=extension
+        self.extension=extension.upper()
     def print_data(self):
         print(self.extension+" "+super().to_string())
     

@@ -25,7 +25,7 @@ def get_extensions():
    return extensions
 
 def get_file_extension(file):
-    return file.split("/")[-1]
+    return file.split("/")[-1].split(".")[1]
 
 def is_valid_url(url):
     parsed_url=urlparse(url)
@@ -46,6 +46,6 @@ def get_random_words(text):
     return result_text
 
 def get_clean_url(url):
-    return re.sub(r"[\/\d]"," ",url)
+    return re.sub(r"[\/%/-/_/\d]"," ",url)
 
     

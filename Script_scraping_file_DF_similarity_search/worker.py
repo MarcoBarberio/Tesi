@@ -3,7 +3,8 @@ from scraper import get_links
 from utilities import get_resource_name,get_file_extension,get_clean_url
 from queue import Empty
 from model import Model
-similarity_threshold=0.3
+URL_similarity_threshold=-1
+file_similarity_threshold=-1
 def worker(max_depth,visited_url,url_queue,file_queue,lock):
     model=Model()
     while(True):
@@ -30,7 +31,7 @@ def worker(max_depth,visited_url,url_queue,file_queue,lock):
             resource_name=get_resource_name(link)
             clean_link=get_clean_url(link)
             similarity=model.get_similarity(clean_link+","+text+","+parent)
-            if similarity>similarity_threshold:
+            if similarity>URL_similarity_threshold:
                 new_node=URL_node(link,node.depth+1,node,resource_name,similarity)
                 new_node.print_data()
                 url_queue.put(new_node)
@@ -38,7 +39,7 @@ def worker(max_depth,visited_url,url_queue,file_queue,lock):
             resource_name=get_resource_name(file)
             clean_file_name=get_clean_url(file)
             similarity=model.get_similarity(clean_file_name+","+text+","+parent)
-            if similarity>similarity_threshold:
+            if similarity>file_similarity_threshold:
                 new_node=File_node(file,node.depth+1,node,get_file_extension(file),resource_name,similarity)
                 new_node.print_data()
                 file_queue.append(new_node)    

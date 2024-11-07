@@ -5,7 +5,6 @@ import json
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy
 
-
 class Model():
     _instance = None
     def __new__(cls):
@@ -17,9 +16,7 @@ class Model():
         if not hasattr(self, 'model'):
             self.model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
             self.tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
-            if self.tokenizer.pad_token is None:
-                self.tokenizer.pad_token = self.tokenizer.eos_token
-
+            
     def create_dictionary_embeddings():
         with open("dictionary.json","r") as f:
             dictionary=json.load("dictionary.json",f)
@@ -49,8 +46,6 @@ class Model():
             dictionary_embeddings_list=json.load(f) 
         if dictionary_embeddings_list is None:
             return -1
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
         input = self.tokenizer(word, padding=True, truncation=True, return_tensors="pt")    
         with torch.no_grad():
             output=self.model(**input)
