@@ -12,15 +12,15 @@ def crawl(root_url,max_depth):
     
     root_resource_name=get_resource_name(root_url)
     root=URL_node(root_url,0,None,root_resource_name,0)
-    url_queue=Queue()
+    url_queue=Queue() #Coda che contiene le pagine web da cui prendere le informazioni. Queue è threadsafe
     url_queue.put(root)
-    file_queue=[]
+    file_queue=[] #Array di file che contengono preferibilmente bilanci di sosteniblità
     visited_url=set()
     lock=threading.Lock()
     threads=[]
     
     for i in range(n_threads):
-        thread=threading.Thread(target=worker,args=(max_depth,visited_url,url_queue,file_queue,lock))
+        thread=threading.Thread(target=worker,args=(max_depth,visited_url,url_queue,file_queue,lock)) #ogni thread naviga una pagina e ne estrae i link
         thread.start()
         threads.append(thread)
     url_queue.join()
@@ -33,7 +33,7 @@ def crawl(root_url,max_depth):
 
 if __name__=="__main__":
     #get_links("https://www.sofidel.com/")
-    depth=2
+    depth=1
     x=datetime.now()
     crawl("https://www.efrag.org/en",depth)
     diff=datetime.now()-x

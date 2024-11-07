@@ -4,17 +4,18 @@ from selenium.webdriver.chrome.options import Options
 import requests
 from utilities import get_random_user_agent,get_domain,get_random_words,get_extensions
 from urllib.parse import urljoin
-import time
 from selenium.webdriver.common.by import By  
 import undetected_chromedriver as uc
-def get_driver(url):
+import os
+
+def get_driver(url): #restituisce il driver selenium
     options = Options()
     options.add_argument("--headless")
     driver = Chrome( options=options)   
     driver.get(url)
     return driver
     
-def get_links(url):
+def get_links(url): #funzione che restituisce i link da una pagina navigata
     link_dict = {
         "redirect_links": [],
         "files": [],
@@ -24,7 +25,7 @@ def get_links(url):
     response = requests.get(url,headers={"User-Agent":get_random_user_agent()})
     markup=response.text
     if response.status_code != 200:
-        if response.status_code==403:
+        if response.status_code==403: #se lo status code è 403 si prova a fare una richiesta con selenium
             dynamic_search(url,link_dict)
             response.status_code=200
         else:
@@ -36,21 +37,21 @@ def get_links(url):
     
     soup = BeautifulSoup(markup, 'html.parser')
     
-    static_search(soup,url,link_dict)
+    static_search(soup,url,link_dict) #ricerca con requests e beautiful soap
     return link_dict
 
 def static_search(soup,url,link_dict):
     domain = get_domain(url)
-    links=soup.find_all("a",href=True)
+    links=soup.find_all("a",href=True) #trova tutti gli anchor
     for link in links:
-        href = link.get("href")
+        href = link.get("href") #prende tutti gli href degli anchor trovati
         text=link.text
         link_parent=link.parent.text
         parent=""
         if link_parent is not None:
-            parent=get_random_words(link_parent)
+            parent=get_random_words(link_parent) #prende parole a caso dal link parent
             
-        full_url = urljoin(url, href) 
+        full_url = urljoin(url, href) #href contiene solo link relativi. Con questo si ricostruisce il link assoluto
         if full_url == url:
             continue      
         full_url_domain = get_domain(full_url)
@@ -73,7 +74,20 @@ def dynamic_search(url,link_dict):
             driver.quit()
         except OSError:
             ""
-        driver_uc=uc.Chrome(headless=False,use_subprocess=True)
+        driver_uc=None
+        try:
+            driver_uc = uc.Chrome(headless=False, use_subprocess=True)
+        except FileExistsError: #se chromedriver.exe esiste allora si rimuove e si prova a rimettere
+            if driver_uc and os.path.exists(driver_uc.service.path):
+                os.remove(driver_uc.service.path)
+                driver_uc = uc.Chrome(headless=False, use_subprocess=True)
+        
+        if not driver_uc:
+            try:
+                driver.quit()
+            except OSError:
+                ""
+            return 
         driver_uc.get(url)
         links=driver_uc.find_elements(By.TAG_NAME,"a")
         for link in links:

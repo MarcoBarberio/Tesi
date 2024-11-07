@@ -1,25 +1,18 @@
+#Ogni nodo contiene informazioni relative ad una pagina URL o un file
 class Node:
     def __init__(self,url,depth,father,resource_name,similarity):
         self.url=url
         self.depth=depth
         self.father=father
         self.resource_name=resource_name
-        self.similarity=similarity
+        self.similarity=similarity #Grado di similarità con i bilanci di similarità. Più è vicino ad 1, maggiore è la probabilità che contenga informazioni sui bilanci
         if father:
             self.father.add_child(self)
+    
     def to_string(self):
         return str(self.depth)+": "+self.url+ " similarity: "+str(self.similarity)
             
-    def bfs(self):
-        queue=[self]
-        while queue:
-            node=queue.pop(0)
-            if isinstance(node, URL_node):
-                print("URL "+str(node.depth)+": "+node.url)
-                queue.extend(node.children)
-            else:
-                print(node.extension+" "+str(node.depth)+": "+node.url)
-                
+    
 class URL_node(Node):
     def __init__(self,url,depth,father,resource_name,similarity):
         super().__init__(url,depth,father,resource_name,similarity)
