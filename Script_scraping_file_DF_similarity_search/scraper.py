@@ -16,16 +16,20 @@ def get_driver(url): #restituisce il driver selenium
     return driver
     
 def get_links(url): #funzione che restituisce i link da una pagina navigata
+    #link dict contiene i link e i file trovati nella pagina, insieme al codice di stato restituito con la get
     link_dict = {
         "redirect_links": [],
         "files": [],
         "status_code":0
     }
     
-    response = requests.get(url,headers={"User-Agent":get_random_user_agent()})
-    markup=response.text
+    try:
+        response = requests.get(url,headers={"User-Agent":get_random_user_agent()})
+    except Exception:
+        return
     if response.status_code != 200:
-        if response.status_code==403: #se lo status code è 403 si prova a fare una richiesta con selenium
+        #se lo status code è 403 si prova a fare una richiesta con selenium
+        if response.status_code==403: 
             dynamic_search(url,link_dict)
             response.status_code=200
         else:
@@ -35,32 +39,40 @@ def get_links(url): #funzione che restituisce i link da una pagina navigata
             
     link_dict["status_code"]=response.status_code
     
-    soup = BeautifulSoup(markup, 'html.parser')
+    #inizializzazione dell'oggetto beautiful soap che fa parsing statico
+    soup = BeautifulSoup(response.text, 'html.parser')
     
-    static_search(soup,url,link_dict) #ricerca con requests e beautiful soap
+    #ricerca con requests e beautiful soap
+    static_search(soup,url,link_dict) 
     return link_dict
 
 def static_search(soup,url,link_dict):
     domain = get_domain(url)
     links=soup.find_all("a",href=True) #trova tutti gli anchor
     for link in links:
+        same_domain=True #indica se il link trovato è contenuto nello stesso dominio
         href = link.get("href") #prende tutti gli href degli anchor trovati
-        text=link.text
-        link_parent=link.parent.text
+        text=link.text #proprietà text dell'anchor
+        link_parent=link.parent.text #proprietà text del contenitore che contiene l'anchor
         parent=""
         if link_parent is not None:
-            parent=get_random_words(link_parent) #prende parole a caso dal link parent
+            #si prendono parole a caso dal contenitore dell'anchor
+            parent=get_random_words(link_parent) 
             
-        full_url = urljoin(url, href) #href contiene solo link relativi. Con questo si ricostruisce il link assoluto
+        #href contiene solo link relativi. Si ricostruisce il link assoluto
+        full_url = urljoin(url, href)
+        #si controlla se il link effettua un redirect verso la stessa pagina. Nel caso viene scartato
         if full_url == url:
             continue      
+        #si controlla se il link appartiene allo stesso dominio del padre
         full_url_domain = get_domain(full_url)
         if full_url_domain != domain:
-            continue
+            same_domain=False
+        #si controlla se è un file o un link
         if full_url.lower().endswith(get_extensions()):
-            link_dict["files"].append((full_url,text,parent))
+            link_dict["files"].append((full_url,text,parent,same_domain))
         else:
-            link_dict["redirect_links"].append((full_url,text,parent))
+            link_dict["redirect_links"].append((full_url,text,parent,same_domain))
 
 
 def dynamic_search(url,link_dict):
@@ -69,7 +81,8 @@ def dynamic_search(url,link_dict):
     driver.get(url)
     links=driver.find_elements(By.TAG_NAME,"a")
     
-    if links[0].text=="Cloudflare": #si prova con uc per evitare il blocco
+    #si prova con uc per evitare il blocco
+    if links[0].text=="Cloudflare": 
         try:
             driver.quit()
         except OSError:
@@ -77,7 +90,8 @@ def dynamic_search(url,link_dict):
         driver_uc=None
         try:
             driver_uc = uc.Chrome(headless=False, use_subprocess=True)
-        except FileExistsError: #se chromedriver.exe esiste allora si rimuove e si prova a rimettere
+        #se chromedriver.exe esiste allora si rimuove e si prova a rimettere
+        except FileExistsError: 
             if driver_uc and os.path.exists(driver_uc.service.path):
                 os.remove(driver_uc.service.path)
                 driver_uc = uc.Chrome(headless=False, use_subprocess=True)
@@ -105,6 +119,7 @@ def dynamic_search(url,link_dict):
             ""
 
 def switch_link(link,url,domain,link_dict):
+    same_domain=True
     href = link.get_attribute("href")
     text=link.text
     link_parent=link.find_element(By.XPATH, "..").text
@@ -117,8 +132,8 @@ def switch_link(link,url,domain,link_dict):
         return      
     full_url_domain = get_domain(full_url)
     if full_url_domain != domain:
-        return
+        same_domain=False
     if full_url.lower().endswith(get_extensions()):
-        link_dict["files"].append((full_url,text,parent))
+        link_dict["files"].append((full_url,text,parent,same_domain))
     else:
-        link_dict["redirect_links"].append((full_url,text,parent))
+        link_dict["redirect_links"].append((full_url,text,parent,same_domain))
