@@ -22,7 +22,7 @@ class Model():
     #Permette di calcolare gli embeddings di una serie di parole caricate su un json insieme ad un peso che ha ogni parola
     def create_dictionary_embeddings(self):  
         with open("dictionary.json","r") as f:
-            dictionary=json.load("dictionary.json",f)
+            dictionary=json.load(f)
         embeddings={}
         for word,rate in dictionary:
             embedding=self.get_embedding(word)

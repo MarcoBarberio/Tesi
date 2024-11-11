@@ -5,7 +5,7 @@ from queue import Empty
 from model import Model
 import time
 #grado di similarità sotto il quale si scartano i link raggiungibili da una pagina
-URL_similarity_threshold=0.4 
+URL_similarity_threshold=0.4
 file_similarity_threshold=0.5
 def worker(max_depth,visited_url,visited_file,url_queue,file_queue,lock):
     #modello per calcolare la similarità tra le parole

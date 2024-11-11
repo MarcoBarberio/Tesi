@@ -1,5 +1,7 @@
 **/__pycache__/
+**/cookies/
 Script_scraping_file_DF_similarity_search/dictionary_embeddings.json
 Script_scraping_file_DF_similarity_search/dictionary_embeddings.json
 Script_scraping_file_DF_similarity_search/__pycache__/model.cpython-312.pyc
 Script_scraping_file_DF_similarity_search/__pycache__/utilities.cpython-312.pyc
+.gitignore
