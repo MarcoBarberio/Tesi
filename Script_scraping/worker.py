@@ -9,7 +9,7 @@ URL_similarity_threshold=0.4
 file_similarity_threshold=0.5
 def worker(max_depth,visited_url,visited_file,url_queue,file_queue,lock):
     #modello per calcolare la similarità tra le parole
-    model=Model() 
+    model=Model()
     while True:
         try:
             node = url_queue.get()

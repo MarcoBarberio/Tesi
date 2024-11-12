@@ -20,19 +20,19 @@ class Model():
             self.tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
     
     #Permette di calcolare gli embeddings di una serie di parole caricate su un json insieme ad un peso che ha ogni parola
-    def create_dictionary_embeddings(self):  
-        with open("dictionary.json","r") as f:
+    def __create_dictionary_embeddings(self):  
+        with open(os.getenv("DICTIONARY"),"r") as f:
             dictionary=json.load(f)
         embeddings={}
         for word,rate in dictionary:
             embedding=self.get_embedding(word)
             #gli embeddings vengono salvati in un file json, insieme al peso che hanno
             embeddings[word]=(embedding.tolist(),rate) 
-        with open("dictionary_embeddings.json","w") as f:
+        with open(os.getenv("DICTIONARY_EMBEDDINGS"),"w") as f:
             json.dump(embeddings,f)
             
     #metodo per calcolare gli embedding di una parola
-    def get_embedding(self,word): 
+    def __get_embedding(self,word): 
         #La parola viene tokenizzata e per ogni token viene restituito un tensore di pytorch
         input = self.tokenizer(word, padding=True, truncation=True, return_tensors="pt") 
         #torch.no grad permette di risparmiare memoria, in quanto non calcola i gradienti (non stiamo addestrando il modello)
@@ -49,10 +49,10 @@ class Model():
     #per il calcolo della similarità di una parola con le parole del dizionario si fa 
     #una media pesata delle tre singole similarità tra la parola e le parole del dizionario con valore più alto
     def get_similarity(self,word):  
-        if not os.path.exists("dictionary_embeddings.json"):
+        if not os.path.exists(os.getenv("DICTIONARY_EMBEDDINGS")):
             self.create_dictionary_embeddings()
         dictionary_embeddings_list=[]
-        with open("dictionary_embeddings.json","r") as f:
+        with open(os.getenv("DICTIONARY_EMBEDDINGS"),"r") as f:
             dictionary_embeddings_list=json.load(f) 
         if dictionary_embeddings_list is None:
             return -1

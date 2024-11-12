@@ -43,14 +43,16 @@ def crawl(root_url,max_depth,chatbot):
     for file in file_queue:
         query+=get_clean_url(file.url)+"\n"
     message_result = str(chatbot.chat(query +" per ogni riga indicare se è un bilancio di sostenibilità o meno, rispondendo con y se lo è o con n altrimenti. non includere altro testo nella risposta"))
-    #la risposta è si compone di una string iniziale seguita da una tabella con colonne: #riga. y/n
+    #la risposta è si compone da righe con scritto y/n
     print("----------------------")
     for file in file_queue:
         file.print_data()
     print(message_result)
+    #si filtra la risposta in modo tale che le righe contengano solo y o n
     message_result = re.sub(r"\d+\.\s", "", message_result)
     responses=message_result.split("\n")
     indices_to_remove = [i for i, response in enumerate(responses) if response.strip().lower() == "n"]
+    #eliminazione dei file che non contengono bilanci
     for index in reversed(indices_to_remove):
         del file_queue[index]
     print(len(file_queue))
@@ -62,9 +64,8 @@ if __name__=="__main__":
     cookie_path_dir = "./cookies/"
     sign = Login(EMAIL, PASSWD)
     cookies = sign.login(cookie_dir_path=cookie_path_dir, save_cookies=True)
-
-# Create your ChatBot
     chatbot = hugchat.ChatBot(cookies=cookies.get_dict())
+
     x=datetime.now()
     url=input("Url: ")
     depth=int(input("Depth: "))

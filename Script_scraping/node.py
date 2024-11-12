@@ -17,7 +17,7 @@ class URL_node(Node):
     def __init__(self,url,depth,father,resource_name,similarity):
         super().__init__(url,depth,father,resource_name,similarity)
         self.children=[]
-    def add_child(self,child):
+    def __add_child(self,child):
         if child:
             self.children.append(child)
     def print_data(self):
