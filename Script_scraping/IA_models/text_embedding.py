@@ -4,13 +4,13 @@ import os
 import json
 from sklearn.metrics.pairwise import cosine_similarity
 
-class Model():
+class Text_embedder():
     #il modello deve essere creato in singleton. 
     _instance = None 
     def __new__(cls): 
         #Viene chiamato da init per istanziare una istanza senza attributi
         if cls._instance is None:
-            cls._instance = super(Model, cls).__new__(cls)
+            cls._instance = super(Text_embedder, cls).__new__(cls)
         return cls._instance
 
     def __init__(self):
@@ -25,7 +25,7 @@ class Model():
             dictionary=json.load(f)
         embeddings={}
         for word,rate in dictionary:
-            embedding=self.get_embedding(word)
+            embedding=self.__get_embedding(word)
             #gli embeddings vengono salvati in un file json, insieme al peso che hanno
             embeddings[word]=(embedding.tolist(),rate) 
         with open(os.getenv("DICTIONARY_EMBEDDINGS"),"w") as f:
@@ -50,14 +50,14 @@ class Model():
     #una media pesata delle tre singole similarità tra la parola e le parole del dizionario con valore più alto
     def get_similarity(self,word):  
         if not os.path.exists(os.getenv("DICTIONARY_EMBEDDINGS")):
-            self.create_dictionary_embeddings()
+            self.__create_dictionary_embeddings()
         dictionary_embeddings_list=[]
         with open(os.getenv("DICTIONARY_EMBEDDINGS"),"r") as f:
             dictionary_embeddings_list=json.load(f) 
         if dictionary_embeddings_list is None:
             return -1
         
-        embedding=self.get_embedding(word)
+        embedding=self.__get_embedding(word)
         #reshape dell'embedding per il calcolo della similarità 
         #(formato da una riga e da un numero di colonne calcolato automaticamente)
         reshaped_word_embedding=embedding.reshape(1,-1) 
