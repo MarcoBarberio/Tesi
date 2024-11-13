@@ -3,8 +3,8 @@ import torch
 import os 
 import json
 from sklearn.metrics.pairwise import cosine_similarity
-
-class Text_embedder():
+from .text_embedding_interface import Text_embedder_interface
+class Text_embedder(Text_embedder_interface):
     #il modello deve essere creato in singleton. 
     _instance = None 
     def __new__(cls): 
@@ -20,7 +20,7 @@ class Text_embedder():
             self.tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
     
     #Permette di calcolare gli embeddings di una serie di parole caricate su un json insieme ad un peso che ha ogni parola
-    def __create_dictionary_embeddings(self):  
+    def _create_dictionary_embeddings(self):  
         with open(os.getenv("DICTIONARY"),"r") as f:
             dictionary=json.load(f)
         embeddings={}
@@ -32,7 +32,7 @@ class Text_embedder():
             json.dump(embeddings,f)
             
     #metodo per calcolare gli embedding di una parola
-    def __get_embedding(self,word): 
+    def _get_embedding(self,word): 
         #La parola viene tokenizzata e per ogni token viene restituito un tensore di pytorch
         input = self.tokenizer(word, padding=True, truncation=True, return_tensors="pt") 
         #torch.no grad permette di risparmiare memoria, in quanto non calcola i gradienti (non stiamo addestrando il modello)
