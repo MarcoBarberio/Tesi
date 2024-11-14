@@ -25,7 +25,7 @@ class Text_embedder(Text_embedder_interface):
             dictionary=json.load(f)
         embeddings={}
         for word,rate in dictionary:
-            embedding=self.__get_embedding(word)
+            embedding=self._get_embedding(word)
             #gli embeddings vengono salvati in un file json, insieme al peso che hanno
             embeddings[word]=(embedding.tolist(),rate) 
         with open(os.getenv("DICTIONARY_EMBEDDINGS"),"w") as f:
@@ -50,14 +50,14 @@ class Text_embedder(Text_embedder_interface):
     #una media pesata delle tre singole similarità tra la parola e le parole del dizionario con valore più alto
     def get_similarity(self,word):  
         if not os.path.exists(os.getenv("DICTIONARY_EMBEDDINGS")):
-            self.__create_dictionary_embeddings()
+            self._create_dictionary_embeddings()
         dictionary_embeddings_list=[]
         with open(os.getenv("DICTIONARY_EMBEDDINGS"),"r") as f:
             dictionary_embeddings_list=json.load(f) 
         if dictionary_embeddings_list is None:
             return -1
         
-        embedding=self.__get_embedding(word)
+        embedding=self._get_embedding(word)
         #reshape dell'embedding per il calcolo della similarità 
         #(formato da una riga e da un numero di colonne calcolato automaticamente)
         reshaped_word_embedding=embedding.reshape(1,-1) 

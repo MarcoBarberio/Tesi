@@ -7,13 +7,13 @@ from urllib.parse import urljoin
 from selenium.webdriver.common.by import By  
 from .scraper_interface import Scraper_interface
 
-class Scraper(Scraper_interface):
+class Scraper_Link_and_File(Scraper_interface):
     
     def __init__(self):
         pass
     
     #funzione che restituisce i link da una pagina navigata
-    def get_links(self,url): 
+    def get_data(self,url): 
         #link dict contiene i link e i file trovati nella pagina, insieme al codice di stato restituito con la get
         link_dict = {
             "redirect_links": [],
@@ -45,7 +45,8 @@ class Scraper(Scraper_interface):
         
         return link_dict
 
-    def _static_search(self,url,soup,link_dict):
+    # funzione che effettua uno scraping statico della pagina con beautiful soap
+    def _static_search(self,url,soup,data_dict):
         
         domain = get_domain(url)
         links=soup.find_all("a",href=True) #trova tutti gli anchor
@@ -70,12 +71,12 @@ class Scraper(Scraper_interface):
                 same_domain=False
             #si controlla se è un file o un link
             if full_url.lower().endswith(get_extensions()):
-                link_dict["files"].append((full_url,text,parent,same_domain))
+                data_dict["files"].append((full_url,text,parent,same_domain))
             else:
-                link_dict["redirect_links"].append((full_url,text,parent,same_domain))
+                data_dict["redirect_links"].append((full_url,text,parent,same_domain))
 
-
-    def _dynamic_search(self,url,link_dict):
+    # funzione che effettua uno scraping dinamico della pagina con selenium
+    def _search(self,url,data_dict):
         
         domain = get_domain(url)
         driver=self._get_driver(url)
@@ -97,17 +98,17 @@ class Scraper(Scraper_interface):
             if full_url_domain != domain:
                 same_domain=False
             if full_url.lower().endswith(get_extensions()):
-                link_dict["files"].append((full_url,text,parent,same_domain))
+                data_dict["files"].append((full_url,text,parent,same_domain))
             else:
-                link_dict["redirect_links"].append((full_url,text,parent,same_domain))
+                data_dict["redirect_links"].append((full_url,text,parent,same_domain))
         try:
             driver.quit()
         except OSError:
             ""
         
-     #restituisce il driver selenium
+    #restituisce il driver selenium
     def _get_driver(self):
-            options = Options()
-            options.add_argument("--headless")
-            driver = Chrome( options=options)   
-            return driver
+        options = Options()
+        options.add_argument("--headless")
+        driver = Chrome( options=options)   
+        return driver

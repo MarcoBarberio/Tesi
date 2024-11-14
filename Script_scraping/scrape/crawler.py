@@ -4,7 +4,6 @@ from tree.URL_node import URL_node
 from queue import Queue
 import threading
 from .worker import worker
-import re
 
 #Data una pagina, si fa lo scrape fino ad un livello fissato
 class Crawler(Crawler_interface):
