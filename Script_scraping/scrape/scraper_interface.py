@@ -6,11 +6,6 @@ class Scraper_interface(ABC):
     def get_data(self,url):
         pass
     
-    @abstractmethod
-    # esegue lo scraping di una pagina
-    # data_dict è un dizionario che contiene le informazioni da restituire
-    def _search(self,url,data_dict):
-        pass
 
-    
+
     

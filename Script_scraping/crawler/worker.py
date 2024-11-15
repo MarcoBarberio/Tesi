@@ -1,6 +1,6 @@
 from tree.URL_node import URL_node
 from tree.File_node import File_node
-from .scraper import Scraper
+from scrape.scraper import Scraper
 from utilities import get_resource_name,get_file_extension,get_clean_url
 from queue import Empty
 from IA_models.text_embedding import Text_embedder
@@ -26,7 +26,7 @@ def worker(max_depth,visited_url,visited_file,url_queue,file_queue,lock):
             url_queue.task_done()
             continue
         #restituisce tutti i link raggiungibili dalla pagina corrente
-        links=scraper.get_links(node.url) 
+        links=scraper.get_data(node.url) 
         #se lo status code non è 200 c'è stato un errore nel reperimento di una pagina
         if links["status_code"]!=200: 
             url_queue.task_done()

@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 from selenium.webdriver.common.by import By  
 from .scraper_interface import Scraper_interface
 
-class Scraper_Link_and_File(Scraper_interface):
+class Scraper(Scraper_interface):
     
     def __init__(self):
         pass
@@ -28,7 +28,7 @@ class Scraper_Link_and_File(Scraper_interface):
         if response.status_code != 200:
             #se lo status code è 403 si prova a fare una richiesta con selenium
             if response.status_code==403: 
-                new_links=self._dynamic_search(url,link_dict)
+                self._dynamic_search(url,link_dict)
                 response.status_code=200
             else:
                 print("Errore "+str(response.status_code)+" nel caricamento della pagina "+url)
@@ -76,7 +76,7 @@ class Scraper_Link_and_File(Scraper_interface):
                 data_dict["redirect_links"].append((full_url,text,parent,same_domain))
 
     # funzione che effettua uno scraping dinamico della pagina con selenium
-    def _search(self,url,data_dict):
+    def _dynamic_search(self,url,data_dict):
         
         domain = get_domain(url)
         driver=self._get_driver(url)

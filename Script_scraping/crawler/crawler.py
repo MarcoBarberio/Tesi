@@ -1,5 +1,5 @@
 from .crawler_interface import Crawler_interface
-from utilities import get_resource_name,is_valid_url,get_clean_url
+from utilities import get_resource_name,is_valid_url
 from tree.URL_node import URL_node
 from queue import Queue
 import threading

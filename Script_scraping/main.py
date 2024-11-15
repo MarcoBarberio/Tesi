@@ -2,7 +2,7 @@ from datetime import datetime
 from hugchat import hugchat
 from hugchat.login import Login
 import os
-from scrape.crawler import Crawler
+from crawler.crawler import Crawler
 from IA_models.text_generation import Text_generator
 if __name__=="__main__":
     x=datetime.now()
