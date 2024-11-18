@@ -6,8 +6,8 @@ from queue import Empty
 from IA_models.text_embedding import Text_embedder
 
 #grado di similarità sotto il quale si scartano i link raggiungibili da una pagina
-URL_similarity_threshold=0.4
-file_similarity_threshold=0.5
+URL_similarity_threshold=-1
+file_similarity_threshold=-1
 def worker(max_depth,visited_url,visited_file,url_queue,file_queue,lock):
     #modello per calcolare la similarità tra le parole
     model=Text_embedder()
@@ -28,6 +28,9 @@ def worker(max_depth,visited_url,visited_file,url_queue,file_queue,lock):
         #restituisce tutti i link raggiungibili dalla pagina corrente
         links=scraper.get_data(node.url) 
         #se lo status code non è 200 c'è stato un errore nel reperimento di una pagina
+        if not links:
+            url_queue.task_done()
+            continue
         if links["status_code"]!=200: 
             url_queue.task_done()
             continue

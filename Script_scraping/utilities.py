@@ -30,7 +30,7 @@ def get_extensions():
 
 def get_file_extension(file):
     #restituisce l'estensione di un file
-    return file.split("/")[-1].split(".")[1]
+    return file.split("/")[-1].split(".")[-1]
 
 def is_valid_url(url): 
     #verifica la validità di un url

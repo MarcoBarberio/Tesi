@@ -23,13 +23,16 @@ class Scraper(Scraper_interface):
         
         try:
             response = requests.get(url,headers={"User-Agent":get_random_user_agent()})
-        except Exception:
-            return
+        except requests.exceptions.RequestException:
+            self._dynamic_search(url,link_dict)
+            return link_dict
+        except Exception as e:
+            print(f"Exception: {e}")
+            return link_dict
         if response.status_code != 200:
             #se lo status code è 403 si prova a fare una richiesta con selenium
             if response.status_code==403: 
                 self._dynamic_search(url,link_dict)
-                response.status_code=200
             else:
                 print("Errore "+str(response.status_code)+" nel caricamento della pagina "+url)
                 link_dict["status_code"]=response.status_code
@@ -79,7 +82,7 @@ class Scraper(Scraper_interface):
     def _dynamic_search(self,url,data_dict):
         
         domain = get_domain(url)
-        driver=self._get_driver(url)
+        driver=self._get_driver()
         driver.get(url)
         links=driver.find_elements(By.TAG_NAME,"a")
         for link in links:
@@ -101,6 +104,7 @@ class Scraper(Scraper_interface):
                 data_dict["files"].append((full_url,text,parent,same_domain))
             else:
                 data_dict["redirect_links"].append((full_url,text,parent,same_domain))
+            data_dict["status_code"]==200
         try:
             driver.quit()
         except OSError:
