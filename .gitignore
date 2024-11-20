@@ -1,5 +1,6 @@
 **/__pycache__/
 **/cookies/
 **/static/
+**/tmp/
 readme
 Script_scraping/main.py

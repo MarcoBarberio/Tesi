@@ -1,10 +1,11 @@
 from .crawler_interface import Crawler_interface
-from utilities import get_resource_name,is_valid_url
+from utilities import get_resource_name,is_valid_url,download_pdf,get_pdf_text
 from tree.URL_node import URL_node
 from queue import Queue
 import threading
 from .worker import worker
-
+from IA_models.text_classificator import Text_classicator
+import os
 #Data una pagina, si fa lo scrape fino ad un livello fissato
 class Crawler(Crawler_interface):
     def __init__(self):
@@ -38,6 +39,10 @@ class Crawler(Crawler_interface):
         for thread in threads:
             thread.join()
         file_queue.sort(key=lambda node: node.similarity, reverse=True)
-        #interrogazione alla generative AI per filtrare file che non contengono bilanci di sostenibilità 
-       
+        
+        text_classifcator=Text_classicator()
+        for file in file_queue:
+            text=get_pdf_text(download_pdf(file.url))
+            print(file.resource_name+": ",text_classifcator.get_prediction(text))
         return file_queue
+    

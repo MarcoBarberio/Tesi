@@ -83,7 +83,10 @@ class Scraper(Scraper_interface):
         
         domain = get_domain(url)
         driver=self._get_driver()
-        driver.get(url)
+        try:
+            driver.get(url)
+        except Exception:
+            return
         links=driver.find_elements(By.TAG_NAME,"a")
         for link in links:
             same_domain=True
@@ -108,7 +111,7 @@ class Scraper(Scraper_interface):
         try:
             driver.quit()
         except OSError:
-            ""
+            return
         
     #restituisce il driver selenium
     def _get_driver(self):

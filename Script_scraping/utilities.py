@@ -1,6 +1,9 @@
 import random
 from urllib.parse import urlparse
 import re
+import fitz
+import requests
+import os
 extensions= (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")
 
 #si accede ad ogni pagina con un user agent diverso per evitare problemi di ban
@@ -53,4 +56,48 @@ def get_clean_url(url):
     #dato un link lo rende più leggibile per il modello di text embedding
     return re.sub(r"[\/%/-/_/\d]"," ",url)
 
+
+def pdf_to_txt(file):
+    #restituisce il testo di un pdf
+    txt_path=file.replace(file.split(".")[-1],"txt")
+    try:
+        with fitz.open(file) as pdf_document:
+            with open(txt_path,"w",encoding="utf-8") as txt_file: 
+                for page_num in range(len(pdf_document)):
+                    text = pdf_document[page_num].get_text()
+                    txt_file.write(text+"\n")
+            return txt_path
+    except Exception:
+        return None
+
+def get_pdf_text(file):
+    #restituisce il testo di un pdf
+    try:
+        text=""
+        with fitz.open(file) as pdf_document:
+            for page_num in range(len(pdf_document)):
+                    text+= pdf_document[page_num].get_text()+"\n"
+        return text
+    except Exception:
+        return None
     
+def download_pdf(file_url): 
+    #scarica un file pdf
+    try:
+        # Effettua la richiesta HTTP per scaricare il PDF
+        response = requests.get(file_url, stream=True)
+        response.raise_for_status()  
+        
+        file_name = file_url.split("/")[-1]
+        # Percorso completo del file di destinazione
+        file_path = os.path.join(os.getenv("TMP_DIR"), file_name)
+        
+        # Salva il file in modalità binaria
+        with open(file_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+                
+        return file_path
+    except Exception as e:
+        print(f"Errore durante il download di {file_url}: {e}")
+        return None

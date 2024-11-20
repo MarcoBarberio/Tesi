@@ -5,7 +5,14 @@ import os
 from crawler.crawler import Crawler
 from IA_models.text_generation import Text_generator
 from scrape.scraper import Scraper
+import requests
+from utilities import download_pdf,get_pdf_text
+from tensorflow.keras.models import load_model
+import tensorflow as tf
+
 if __name__=="__main__":
+    
+    
     x=datetime.now()
     url=input("Url: ")
     depth=int(input("Depth: "))
@@ -21,4 +28,5 @@ if __name__=="__main__":
     print("Profondità "+str(depth)+": "+str(minutes)+" min "+str(seconds)+"s")
     print("------------------------")
     for file in files:
-        print(file.to_string())
+        break
+
