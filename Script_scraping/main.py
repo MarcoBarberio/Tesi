@@ -1,14 +1,5 @@
 from datetime import datetime
-from hugchat import hugchat
-from hugchat.login import Login
-import os
 from crawler.crawler import Crawler
-from IA_models.text_generation import Text_generator
-from scrape.scraper import Scraper
-import requests
-from utilities import download_pdf,get_pdf_text
-from tensorflow.keras.models import load_model
-import tensorflow as tf
 
 if __name__=="__main__":
     
@@ -28,5 +19,5 @@ if __name__=="__main__":
     print("Profondità "+str(depth)+": "+str(minutes)+" min "+str(seconds)+"s")
     print("------------------------")
     for file in files:
-        break
+        print(file.resource_name)
 

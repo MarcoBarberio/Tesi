@@ -2,6 +2,7 @@ from tensorflow.keras.models import load_model
 import tensorflow as tf
 from .text_classificator_interface import Text_classificator_interface
 import os
+from utilities import download_pdf,get_pdf_text
 
 class Text_classicator(Text_classificator_interface):
     #il modello deve essere creato in singleton. 
@@ -26,7 +27,28 @@ class Text_classicator(Text_classificator_interface):
                     custom_objects={"custom_standardization": custom_standardization})
 
     def get_prediction(self, text):
-        input_tensor = tf.constant([text])
-        return self.model.predict(input_tensor)[0,0]
+        #fa la predizione di una sola parola
+        return self.model.predict(tf.constant([text]))[0,0]
     
-    
+    def get_prediction_from_file(self,file_url):
+        #fa la predizione su un intero file
+        predictions=[]
+        pdf_file=download_pdf(file_url)
+        if not pdf_file:
+            return 0 # se il file è vuoto non è un bilancio di sostenibilità
+        file_text=get_pdf_text(pdf_file)
+        if not file_text:
+            return 0
+        #si fanno predizioni su sottostringhe di massimo 5000 caratteri
+        chunk_size=5000
+        for i in range(0,len(file_text),chunk_size):
+            predictions.append(self.get_prediction(file_text[i:chunk_size+i]))
+        
+        if len(predictions)<3:
+            return 0 # un pdf composto da meno di 15000 caratteri non può essere un bilancio di sostenibilità
+        
+        #si calcola la predizione su una media delle migliori 3 predizioni
+        predictions.sort()
+        
+        prediction=sum(predictions[0:2]) / 3
+        return prediction

@@ -101,3 +101,9 @@ def download_pdf(file_url):
     except Exception as e:
         print(f"Errore durante il download di {file_url}: {e}")
         return None
+    
+def clean_tmp():
+    tmp=os.getenv("TMP_DIR")
+    for file_name in os.listdir(tmp):
+        file=os.path.join(tmp,file_name)
+        os.remove(file)
