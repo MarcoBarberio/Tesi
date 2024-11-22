@@ -1,9 +1,11 @@
 from tensorflow.keras.models import load_model
 import tensorflow as tf
 from .text_classificator_interface import Text_classificator_interface
+from dotenv import load_dotenv
 import os
 from utilities import download_pdf,get_pdf_text
 
+load_dotenv()
 class Text_classicator(Text_classificator_interface):
     #il modello deve essere creato in singleton. 
     _instance = None 
@@ -23,7 +25,7 @@ class Text_classicator(Text_classificator_interface):
                     stripped_html, r'[^a-zA-Z0-9\s]', '') 
                 return sanitized_text
             self.model =load_model(
-                    os.getenv("TEXT_CLASSIFICATOR_PATH"),
+                    os.getenv("TEXT_CLASSIFICATOR"),
                     custom_objects={"custom_standardization": custom_standardization})
 
     def get_prediction(self, text):

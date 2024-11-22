@@ -4,6 +4,8 @@ import re
 import fitz
 import requests
 import os
+from dotenv import load_dotenv
+load_dotenv()
 extensions= (".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")
 
 #si accede ad ogni pagina con un user agent diverso per evitare problemi di ban
@@ -103,7 +105,8 @@ def download_pdf(file_url):
         return None
     
 def clean_tmp():
-    tmp=os.getenv("TMP_DIR")
-    for file_name in os.listdir(tmp):
-        file=os.path.join(tmp,file_name)
-        os.remove(file)
+    ""
+    # tmp=os.getenv("TMP_DIR")
+    # for file_name in os.listdir(tmp):
+    #     file=os.path.join(tmp,file_name)
+    #     os.remove(file)

@@ -1,9 +1,11 @@
 from transformers import AutoTokenizer, AutoModel
 import torch
+from dotenv import load_dotenv
 import os 
 import json
 from sklearn.metrics.pairwise import cosine_similarity
 from .text_embedding_interface import Text_embedder_interface
+load_dotenv() 
 class Text_embedder(Text_embedder_interface):
     #il modello deve essere creato in singleton. 
     _instance = None 
@@ -21,6 +23,7 @@ class Text_embedder(Text_embedder_interface):
     
     #Permette di calcolare gli embeddings di una serie di parole caricate su un json insieme ad un peso che ha ogni parola
     def _create_dictionary_embeddings(self):  
+        
         with open(os.getenv("DICTIONARY"),"r") as f:
             dictionary=json.load(f)
         embeddings={}
@@ -28,6 +31,7 @@ class Text_embedder(Text_embedder_interface):
             embedding=self._get_embedding(word)
             #gli embeddings vengono salvati in un file json, insieme al peso che hanno
             embeddings[word]=(embedding.tolist(),rate) 
+            
         with open(os.getenv("DICTIONARY_EMBEDDINGS"),"w") as f:
             json.dump(embeddings,f)
             
@@ -48,7 +52,7 @@ class Text_embedder(Text_embedder_interface):
     
     #per il calcolo della similarità di una parola con le parole del dizionario si fa 
     #una media pesata delle tre singole similarità tra la parola e le parole del dizionario con valore più alto
-    def get_similarity(self,word):  
+    def get_similarity(self,word): 
         if not os.path.exists(os.getenv("DICTIONARY_EMBEDDINGS")):
             self._create_dictionary_embeddings()
         dictionary_embeddings_list=[]

@@ -8,9 +8,10 @@ if __name__=="__main__":
     url=input("Url: ")
     depth=int(input("Depth: "))
     crawler=Crawler()
-    files=crawler.crawl(url,depth)
+    files=crawler.crawl(url,depth,url_threshold=0.4,file_threshold=0.5)
+    # se non si trovano file si riprova con una navigazione più ampia
     if not files:
-        files=crawler.crawl(url,depth+1)
+        files=crawler.crawl(url,depth+1,url_threshold=0.5,file_threshold=0.6)
     diff=datetime.now()-x
     total_seconds = diff.total_seconds()
     minutes = int(total_seconds // 60)

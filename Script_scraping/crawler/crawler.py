@@ -11,8 +11,10 @@ PREDICTION_THRESHOLD=0.20
 class Crawler(Crawler_interface):
     def __init__(self):
         self.__n_threads=30
-    
-    def crawl(self,root_url,max_depth):
+        #grado di similarità sotto il quale si scartano i link raggiungibili da una pagina
+        
+        
+    def crawl(self,root_url,max_depth,url_threshold,file_threshold):
         if not is_valid_url(root_url):
             return
         
@@ -29,7 +31,8 @@ class Crawler(Crawler_interface):
         threads=[]
         
         for i in range(self.__n_threads):
-            thread=threading.Thread(target=worker,args=(max_depth,visited_url,visited_file,url_queue,file_queue,lock)) #ogni thread naviga una pagina e ne estrae i link
+            thread=threading.Thread(target=worker,args=(max_depth,visited_url,visited_file,url_queue,file_queue,lock,url_threshold,file_threshold))
+            #ogni thread naviga una pagina e ne estrae i link
             thread.start()
             threads.append(thread)
         url_queue.join()

@@ -4,3 +4,4 @@
 **/tmp/
 readme
 Script_scraping/main.py
+.env
