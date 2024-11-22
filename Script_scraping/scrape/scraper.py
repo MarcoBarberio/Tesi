@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 import requests
-from utilities import get_random_user_agent,get_domain,get_random_words,get_extensions
+from utilities import get_random_user_agent,get_domain,get_random_words,get_extensions,get_file_extension
 from urllib.parse import urljoin
 from selenium.webdriver.common.by import By  
 from .scraper_interface import Scraper_interface
@@ -73,8 +73,9 @@ class Scraper(Scraper_interface):
             if full_url_domain != domain:
                 same_domain=False
             #si controlla se è un file o un link
-            if full_url.lower().endswith(get_extensions()):
-                data_dict["files"].append((full_url,text,parent,same_domain))
+            if get_file_extension(full_url.lower()) in (get_extensions()):
+                if get_file_extension(full_url.lower())=="pdf":
+                    data_dict["files"].append((full_url,text,parent,same_domain))
             else:
                 data_dict["redirect_links"].append((full_url,text,parent,same_domain))
 
@@ -103,8 +104,9 @@ class Scraper(Scraper_interface):
             full_url_domain = get_domain(full_url)
             if full_url_domain != domain:
                 same_domain=False
-            if full_url.lower().endswith(get_extensions()):
-                data_dict["files"].append((full_url,text,parent,same_domain))
+            if get_file_extension(full_url.lower()) in (get_extensions()):
+                if get_file_extension(full_url.lower())=="pdf":
+                    data_dict["files"].append((full_url,text,parent,same_domain))
             else:
                 data_dict["redirect_links"].append((full_url,text,parent,same_domain))
             data_dict["status_code"]==200
